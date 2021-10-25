@@ -1,35 +1,69 @@
-import logo from './logo.svg';
-import React, { useState } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import './App.css';
 
+/*
+  1. Display initial page with capture mood - captureImagePage is true
+  2. Receive Emotions from backend, set capureImagePage to false, set emotionPage to True and render that page
+*/
+
 function App() {
-  const [picture,setPicture] = useState('');
-  let fileSelectedHandler = (event) => {
-    setPicture(event.target.files[0]);
-    // picture = event.target.files[0]
+  const [picture,setPicture] = useState(null);
+  const videoRef = useRef(null);
+  const photoRef = useRef(null);
+  const [hasPhoto, setHasPhoto] = useState(false);
+  const getVideo = () => {
+    navigator.mediaDevices
+    .getUserMedia({
+      video: {width: 1920, height: 1080}
+    })
+    .then(stream => {
+      let video = videoRef.current;
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch(err => {
+      console.error(err);
+    })
+    ;
   }
 
-  let sendPictureToBackend = (e) => {
-    /*if(picture === ''){
-    }*/
-    e.preventDefault();
+  const takePhoto = () => {
+    const width = 414;
+    const height = width / (16/9);
+    let video = videoRef.current;
+    let photo = photoRef.current;
+    photo.width = width;
+    photo.height = height;
+    let ctx = photo.getContext('2d');
+    ctx.drawImage(video, 0,0,width,height);
+    setPicture(photoRef.current.toDataURL('image/png'));
+    setHasPhoto(true);
     /*const requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(picture)
+      headers: { 'Content-Type': 'multipart/form-data' },
+      body: picture
     };
     fetch('https://localhost3000/bop', requestOptions)
         .then(response => response.json())
-        .then(data => setPostId(data.id));*/
+        .then(data => {
+          setEmotions(data);
+        });*/
+
   }
+
+  useEffect(() => {
+    getVideo();
+  },[videoRef]);
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <input type="file" onChange={fileSelectedHandler}/>
-        <button onClick={sendPictureToBackend}> Upload Picture </button>
-      </header>
+        <div className = "camera">
+          <video ref={videoRef}></video>
+          <button onClick={takePhoto}>SNAP!</button>
+        </div>
+        <div className={"result" + (hasPhoto ? 'hasPhoto' :'')}>
+          <canvas ref={photoRef}></canvas>
+        </div>
     </div>
   );
 }
