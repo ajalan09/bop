@@ -1,5 +1,7 @@
 import React, { useState,useRef,useEffect } from 'react';
 import './App.css';
+import Colors from './Colors';
+import { Card, Button } from 'react-bootstrap'
 
 /*
   1. Display initial page with capture mood - captureImagePage is true
@@ -61,7 +63,7 @@ function App() {
     <div className="App">
         <div className = "camera">
           <video ref={videoRef}></video>
-          <button onClick={takePhoto}>SNAP!</button>
+          <Button size="lg" onClick={takePhoto}> SNAP!</Button> {' '}
         </div>
         <div className={"result" + (hasPhoto ? 'hasPhoto' :'')}>
           <canvas ref={photoRef}></canvas>
@@ -69,5 +71,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
