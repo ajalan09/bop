@@ -7,12 +7,18 @@ import { Card, Button } from 'react-bootstrap'
   1. Display initial page with capture mood - captureImagePage is true
   2. Receive Emotions from backend, set capureImagePage to false, set emotionPage to True and render that page
 */
+let emo = null;
+let picture = null;
 
 function App() {
-  const [picture,setPicture] = useState(null);
+  const [state1,setState1] = useState(true);
+  const [state2,setState2] = useState(false);
+  const [state3,setState3] = useState(false);
+
+  const [hasPhoto, setHasPhoto] = useState(false);
   const videoRef = useRef(null);
   const photoRef = useRef(null);
-  const [hasPhoto, setHasPhoto] = useState(false);
+
   const getVideo = () => {
     navigator.mediaDevices
     .getUserMedia({
@@ -38,38 +44,55 @@ function App() {
     photo.height = height;
     let ctx = photo.getContext('2d');
     ctx.drawImage(video, 0,0,width,height);
-    setPicture(photoRef.current.toDataURL('image/png'));
     setHasPhoto(true);
-    const data = new FormData();
-    data.append('img',photoRef.current.toDataURL('image/png'));
+
+    const formData = new FormData();
+    formData.append('img',photoRef.current.toDataURL('image/png'));
+    picture = new Image();
+    picture.src = photoRef.current.toDataURL('image/png');
+    console.log(picture);
 
     const requestOptions = {
       method: 'POST',
-      body: data,
+      body: formData,
     };
 
-    fetch('http://f9ec-162-242-91-65.ngrok.io/pic', requestOptions)
+    fetch('http://abfa-162-242-91-65.ngrok.io/pic', requestOptions)
         .then(response => response.json())
         .then(data => {
-          console.log(data);
+          emo = JSON.stringify(data['emotion']);
+          setState2(true);
+          setState1(false);
     });
   }
 
   useEffect(() => {
-    getVideo();
+    if(state1 === true){
+      getVideo();
+    }
   },[videoRef]);
 
-  return (
-    <div className="App">
-        <div className = "camera">
-          <video ref={videoRef}></video>
-          <Button size="lg" onClick={takePhoto}> SNAP!</Button> {' '}
-        </div>
-        <div className={"result" + (hasPhoto ? 'hasPhoto' :'')}>
-          <canvas ref={photoRef}></canvas>
-        </div>
-    </div>
-  );
+  if(state1 === true){
+    return (
+      <div className="App">
+          <div className = "camera">
+            <video ref={videoRef}></video>
+            <Button size="lg" onClick={takePhoto}> SNAP!</Button>
+          </div>
+          <div className={"result" + (hasPhoto ? 'hasPhoto' :'')}>
+            <canvas ref={photoRef}></canvas>
+          </div>
+      </div>
+    );
+  }
+  else if(state2 === true){
+    return (
+      <div>
+        <img src = {picture.src} /> 
+        <div>{emo}</div>
+      </div>
+    );
+  }
 }
 
 
