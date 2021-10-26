@@ -38,17 +38,19 @@ function App() {
     ctx.drawImage(video, 0,0,width,height);
     setPicture(photoRef.current.toDataURL('image/png'));
     setHasPhoto(true);
-    /*const requestOptions = {
+    const data = new FormData();
+    data.append('img',photoRef.current.toDataURL('image/png'));
+
+    const requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'multipart/form-data' },
-      body: picture
+      body: data,
     };
-    fetch('https://localhost3000/bop', requestOptions)
+
+    fetch('http://f9ec-162-242-91-65.ngrok.io/pic', requestOptions)
         .then(response => response.json())
         .then(data => {
-          setEmotions(data);
-        });*/
-
+          console.log(data);
+    });
   }
 
   useEffect(() => {
