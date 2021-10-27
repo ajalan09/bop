@@ -7,13 +7,12 @@ import { Card, Button } from 'react-bootstrap'
   1. Display initial page with capture mood - captureImagePage is true
   2. Receive Emotions from backend, set capureImagePage to false, set emotionPage to True and render that page
 */
+
 let emo = null;
 let picture = null;
 
 function App() {
   const [state1,setState1] = useState(true);
-  const [state2,setState2] = useState(false);
-  const [state3,setState3] = useState(false);
 
   const [hasPhoto, setHasPhoto] = useState(false);
   const videoRef = useRef(null);
@@ -52,7 +51,7 @@ function App() {
     picture.src = photoRef.current.toDataURL('image/png');
     console.log(picture);
 
-    const requestOptions = {
+    /*const requestOptions = {
       method: 'POST',
       body: formData,
     };
@@ -63,7 +62,7 @@ function App() {
           emo = JSON.stringify(data['emotion']);
           setState2(true);
           setState1(false);
-    });
+    });*/
   }
 
   useEffect(() => {
@@ -72,27 +71,27 @@ function App() {
     }
   },[videoRef]);
 
-  if(state1 === true){
     return (
       <div className="App">
-          <div className = "camera">
-            <video ref={videoRef}></video>
-            <Button size="lg" onClick={takePhoto}> SNAP!</Button>
+        {!hasPhoto ? 
+          <div>
+            <div className = "camera">
+                <video ref={videoRef}></video>
+                <Button size="lg" onClick={takePhoto}> SNAP!</Button>
+            </div> 
+            <div className={"result" + (hasPhoto ? 'hasPhoto' :'')}>
+              <canvas ref={photoRef}></canvas>
+            </div>
           </div>
-          <div className={"result" + (hasPhoto ? 'hasPhoto' :'')}>
-            <canvas ref={photoRef}></canvas>
+        : 
+          <div>
+            <img src = {picture.src} /> 
+            <p>Your emotions are</p>
+            <div>{emo}</div>
           </div>
+        }
       </div>
     );
-  }
-  else if(state2 === true){
-    return (
-      <div>
-        <img src = {picture.src} /> 
-        <div>{emo}</div>
-      </div>
-    );
-  }
 }
 
 
