@@ -88,6 +88,7 @@ function App() {
             <img src = {picture.src} /> 
             <p>Your emotions are</p>
             <div>{emo}</div>
+            <button size="lg">FIND SONGS!</button>
           </div>
         }
       </div>
