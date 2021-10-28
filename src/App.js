@@ -1,5 +1,6 @@
 import React, { useState,useRef,useEffect } from 'react';
 import './App.css';
+import Songs from './Songs';
 import Colors from './Colors';
 import { Card, Button } from 'react-bootstrap'
 
@@ -10,13 +11,20 @@ import { Card, Button } from 'react-bootstrap'
 
 let emo = null;
 let picture = null;
+let songs = null;
+let authURL = null;
 
 function App() {
   const [state1,setState1] = useState(true);
 
   const [hasPhoto, setHasPhoto] = useState(false);
+  const [hasSongs, setHasSongs] = useState(false);
   const videoRef = useRef(null);
   const photoRef = useRef(null);
+
+  const fetchSongs = () => {
+    //setHasSongs(true);
+  }
 
   const getVideo = () => {
     navigator.mediaDevices
@@ -51,18 +59,32 @@ function App() {
     picture.src = photoRef.current.toDataURL('image/png');
     console.log(picture);
 
-    /*const requestOptions = {
+    const requestOptions = {
       method: 'POST',
       body: formData,
     };
 
-    fetch('http://abfa-162-242-91-65.ngrok.io/pic', requestOptions)
+    fetch('http://7d09-35-3-108-84.ngrok.io/pic', requestOptions)
         .then(response => response.json())
-        .then(data => {
-          emo = JSON.stringify(data['emotion']);
-          setState2(true);
+        .then(data1 => {
+        emo = JSON.stringify(data1['emotion']);
+
+        fetch('http://7d09-35-3-108-84.ngrok.io/auth', 
+        {
+          method: 'POST', 
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'same-origin', 
+          body: JSON.stringify(emo)
+        })
+        .then(response => response.json()) 
+        .then(data2 => {
+          authURL = data2['auth_url'];
+
           setState1(false);
-    });*/
+      });
+    });
   }
 
   useEffect(() => {
@@ -73,7 +95,10 @@ function App() {
 
     return (
       <div className="App">
-        {!hasPhoto ? 
+        {hasSongs ? 
+        <Songs /> 
+        : 
+        (!hasPhoto ? 
           <div>
             <div className = "camera">
                 <video ref={videoRef}></video>
@@ -88,9 +113,10 @@ function App() {
             <img src = {picture.src} /> 
             <p>Your emotions are</p>
             <div>{emo}</div>
-            <button size="lg">FIND SONGS!</button>
+            {!state1 ? <a size="lg" href = {authURL} onClick={fetchSongs}>FIND SONGS!</a> : ''}
           </div>
-        }
+          )
+        }  
       </div>
     );
 }
